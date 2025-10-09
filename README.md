@@ -1,5 +1,4 @@
 # 🎈 Blank app template
-// 내가 만든 앱에 대한 설명을 적는 곳이라 우리는 그냥 둬도 됨
 
 A simple Streamlit app template for you to modify!
 
