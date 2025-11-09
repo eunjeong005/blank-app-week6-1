@@ -69,3 +69,41 @@ st.warning('경고 메시지')
 st.info('정보 메시지')
 st.success('성공 메시지')
 st.exception(Exception('예외 메시지'))
+
+# 그래프를 그리는/표시하는 부분 교체 또는 추가
+col_left, col_right = st.columns([2,1])
+with col_left:
+    # 파일 또는 PIL 이미지 객체 사용 가능
+    st.image("assets/graph_current.png", caption="그래프 미리보기", use_column_width=False, width=560)
+with col_right:
+    # 기존 컨트롤(이동 버튼 등)
+    ...
+
+st.markdown("""
+<style>
+/* 그래프가 들어가는 컨테이너 이미지 강제 크기 */
+.main .graph-container img { width: 560px !important; height: auto !important; }
+</style>
+""", unsafe_allow_html=True)
+# 그리고 이미지를 감싸는 div에 class="graph-container"를 사용
+st.markdown('<div class="graph-container">' + '<img src="assets/graph_current.png">' + '</div>', unsafe_allow_html=True)
+
+# 초기화: 세션 상태
+if "moved" not in st.session_state:
+    st.session_state["moved"] = False
+
+def do_move(direction, amount):
+    # 그래프 이동 로직 실행 (기존 코드)
+    # ...existing code...
+    st.session_state["moved"] = True
+
+# 버튼 예시
+if st.button("위로"):
+    do_move("up", input_amount)
+
+# 성공 체크: 반드시 사용자가 이동한 이후에만 확인
+current_coeffs = (a_cur, b_cur, c_cur)  # 현재 계수 얻기 (기존 변수)
+target_coeffs = (a_target, b_target, c_target)  # 목표 계수
+
+if st.session_state.get("moved", False) and current_coeffs == target_coeffs:
+    st.success("🎉 완벽합니다! 한 번에 성공하셨네요!")
