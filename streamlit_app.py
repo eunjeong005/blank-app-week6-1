@@ -1,109 +1,97 @@
 import streamlit as st
 
-st.title("🎈 Streamlit 요소 데모")
-st.header("1. 텍스트 요소")
-st.text('이것은 일반 텍스트입니다.')
-st.markdown('**마크다운** _스타일링_ 지원')
-st.caption('캡션: 부가 설명')
-st.code('print("Hello, Streamlit!")', language='python')
-st.latex(r'\alpha^2 + \beta^2 = \gamma^2')
+st.set_page_config(layout="wide")
+st.title("🎯 이차함수 완전제곱식 & 그래프 변환 학습")
 
-st.header("2. 데이터 표시")
-st.write({'키': '값', '숫자': 123})
-st.json({'name': '홍길동', 'age': 30, 'job': '개발자'})
-import pandas as pd
-import numpy as np
-df = pd.DataFrame(
-    np.random.randn(5, 3),
-    columns=['A', 'B', 'C']
-)
-st.dataframe(df)
-st.table(df.head(3))
+# --- 세션 상태 초기화 ---
+if "moved" not in st.session_state:
+    st.session_state.moved = False
+if "a" not in st.session_state:
+    st.session_state.a = 5
+if "b" not in st.session_state:
+    st.session_state.b = 0
+if "c" not in st.session_state:
+    st.session_state.c = 0
 
-st.header("3. 차트와 그래프")
-st.line_chart(df)
-st.bar_chart(df)
-st.area_chart(df)
+# 예시 목표 (화면에 표시될 목표식 — 필요시 동적으로 설정)
+if "target" not in st.session_state:
+    st.session_state.target = {"a": 5, "b": 30, "c": 0}
 
-st.header("4. 입력 위젯")
-name = st.text_input('이름을 입력하세요')
-age = st.number_input('나이', min_value=0, max_value=120, value=25)
-agree = st.checkbox('동의합니다')
-selected = st.radio('성별', ['남성', '여성', '기타'])
-option = st.selectbox('좋아하는 동물', ['강아지', '고양이', '토끼'])
-multi = st.multiselect('좋아하는 색상', ['빨강', '파랑', '초록', '노랑'])
-date = st.date_input('날짜 선택')
-time = st.time_input('시간 선택')
-st.file_uploader('파일 업로드')
-st.color_picker('색상 선택')
-
-st.header("5. 버튼과 상호작용")
-if st.button('클릭!'):
-    st.success('버튼이 눌렸어요!')
-st.download_button('텍스트 다운로드', '이것은 다운로드할 텍스트입니다.', file_name='sample.txt')
-
-st.header("6. 슬라이더")
-value = st.slider('값을 선택하세요', 0, 100, 50)
-st.write('선택한 값:', value)
-
-st.header("7. 진행상황 표시")
-st.progress(70)
-with st.spinner('로딩 중...'):
-    import time
-    time.sleep(0.5)
-st.success('로딩 완료!')
-
-st.header("8. 사이드바")
-st.sidebar.title('사이드바')
-st.sidebar.button('사이드바 버튼')
-st.sidebar.selectbox('사이드바 선택', ['A', 'B', 'C'])
-
-st.header("9. 미디어")
-st.image('https://static.streamlit.io/examples/cat.jpg', caption='고양이')
-st.audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')
-st.video('https://www.youtube.com/watch?v=5qap5aO4i9A')
-
-st.header("10. 기타")
-st.error('에러 메시지')
-st.warning('경고 메시지')
-st.info('정보 메시지')
-st.success('성공 메시지')
-st.exception(Exception('예외 메시지'))
-
-# 그래프를 그리는/표시하는 부분 교체 또는 추가
-col_left, col_right = st.columns([2,1])
-with col_left:
-    # 파일 또는 PIL 이미지 객체 사용 가능
-    st.image("assets/graph_current.png", caption="그래프 미리보기", use_column_width=False, width=560)
-with col_right:
-    # 기존 컨트롤(이동 버튼 등)
-    ...
-
+# 간단한 이미지 스타일 (이미지 사이즈 고정해서 축소/확대 문제 방지)
 st.markdown("""
 <style>
-/* 그래프가 들어가는 컨테이너 이미지 강제 크기 */
-.main .graph-container img { width: 560px !important; height: auto !important; }
+img.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 640px;
+  height: auto;
+}
+.container-box {
+  border-radius: 10px;
+  padding: 20px;
+  background: #ffffff;
+}
 </style>
 """, unsafe_allow_html=True)
-# 그리고 이미지를 감싸는 div에 class="graph-container"를 사용
-st.markdown('<div class="graph-container">' + '<img src="assets/graph_current.png">' + '</div>', unsafe_allow_html=True)
 
-# 초기화: 세션 상태
-if "moved" not in st.session_state:
-    st.session_state["moved"] = False
+# 상단 안내
+st.subheader("그래프 평행이동하기")
+st.write(f"원래 이차함수식: y = {st.session_state.a}x² + {st.session_state.b}x + {st.session_state.c}")
+st.write("목표식:", f"y = {st.session_state.target['a']}x² + {st.session_state.target['b']}x + {st.session_state.target['c']}")
 
-def do_move(direction, amount):
-    # 그래프 이동 로직 실행 (기존 코드)
-    # ...existing code...
-    st.session_state["moved"] = True
+# 레이아웃: 이미지(왼쪽) / 컨트롤(오른쪽)
+left, right = st.columns([2, 1])
+with left:
+    st.markdown('<div class="container-box">', unsafe_allow_html=True)
+    # 실제 프로젝트에서는 그래프를 동적으로 생성해서 파일로 저장한 뒤 경로를 넣으세요.
+    # 여기서는 프로젝트에 있는 정적 이미지가 있다면 그걸 사용합니다.
+    # assets/graph_current.png 파일이 없으면 외부 임시 이미지로 대체됩니다.
+    import os
+    img_path = "assets/graph_current.png"
+    if not os.path.exists(img_path):
+        img_src = "https://placehold.co/640x480?text=Graph+Placeholder"
+        st.markdown(f'<img class="centered" src="{img_src}">', unsafe_allow_html=True)
+    else:
+        st.image(img_path, use_column_width=False, width=640)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# 버튼 예시
-if st.button("위로"):
-    do_move("up", input_amount)
+with right:
+    st.markdown('<div class="container-box">', unsafe_allow_html=True)
+    st.write("그래프 이동하기")
+    amount = st.number_input("이동량 입력 (정수)", step=1, value=10)
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("↑ 위로"):
+            st.session_state.c += amount
+            st.session_state.moved = True
+        if st.button("← 왼쪽"):
+            st.session_state.b -= amount
+            st.session_state.moved = True
+    with col2:
+        if st.button("↓ 아래로"):
+            st.session_state.c -= amount
+            st.session_state.moved = True
+        if st.button("→ 오른쪽"):
+            st.session_state.b += amount
+            st.session_state.moved = True
 
-# 성공 체크: 반드시 사용자가 이동한 이후에만 확인
-current_coeffs = (a_cur, b_cur, c_cur)  # 현재 계수 얻기 (기존 변수)
-target_coeffs = (a_target, b_target, c_target)  # 목표 계수
+    if st.button("초기화"):
+        st.session_state.a = 5
+        st.session_state.b = 0
+        st.session_state.c = 0
+        st.session_state.moved = False
+        st.experimental_rerun()
 
-if st.session_state.get("moved", False) and current_coeffs == target_coeffs:
+    st.markdown("---")
+    st.write("현재 계수:", f"a={st.session_state.a}, b={st.session_state.b}, c={st.session_state.c}")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# 성공 체크: 반드시 사용자가 이동한 이후에만 성공 메시지 표시
+current = (st.session_state.a, st.session_state.b, st.session_state.c)
+target = (st.session_state.target["a"], st.session_state.target["b"], st.session_state.target["c"])
+if st.session_state.moved and current == target:
     st.success("🎉 완벽합니다! 한 번에 성공하셨네요!")
+else:
+    # 성공 메시지를 미리 보여주는 기존 오류를 방지하기 위해 아무 것도 출력하지 않습니다.
+    pass
